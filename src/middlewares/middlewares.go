@@ -15,3 +15,13 @@ func Auth(next http.HandlerFunc) http.HandlerFunc {
 		next(w, r)
 	}
 }
+
+func AuthRefresh(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if erro := auth.ValidateTokenRefresh(r); erro != nil {
+			msgresponse.Erro(w, http.StatusUnauthorized, erro)
+			return
+		}
+		next(w, r)
+	}
+}

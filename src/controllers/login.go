@@ -50,3 +50,28 @@ type userTokenLogin struct {
 	ID    int64
 	Token map[string]string
 }
+
+func RefreshToken(w http.ResponseWriter, r *http.Request) {
+	bodyRequest, erro := ioutil.ReadAll(r.Body)
+	if erro != nil {
+		msgresponse.Erro(w, http.StatusUnprocessableEntity, erro)
+		return
+	}
+
+	//convertendo de JSON para STRUCT
+	var user models.User
+	if erro = json.Unmarshal(bodyRequest, &user); erro != nil {
+		msgresponse.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	refreshToken, userID, erro := auth.CreateTokenRefresh(user.ID)
+	if erro != nil {
+		msgresponse.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	userToken := userTokenLogin{userID, refreshToken}
+
+	msgresponse.JSON(w, http.StatusCreated, userToken)
+}

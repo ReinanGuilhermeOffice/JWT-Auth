@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"jwtauth/src/config"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -17,7 +18,7 @@ type UserToken struct {
 	refresh_token string
 }
 
-func CreateTokenLogin(userID uint64) (map[string]string, int64, error) {
+func CreateTokenLogin(userID uint64) (map[string]string, error) {
 	permission := jwt.MapClaims{}
 	permission["authorized"] = true
 	permission["exp"] = time.Now().Add(time.Second * 20).Unix()
@@ -25,7 +26,7 @@ func CreateTokenLogin(userID uint64) (map[string]string, int64, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, permission)
 	t, erro := token.SignedString([]byte(config.SecretKey))
 	if erro != nil {
-		return nil, 0, erro
+		return nil, erro
 	}
 
 	permissionRefresh := jwt.MapClaims{}
@@ -34,16 +35,17 @@ func CreateTokenLogin(userID uint64) (map[string]string, int64, error) {
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, permissionRefresh)
 	rt, erro := refreshToken.SignedString([]byte(config.SecretKeyRefresh))
 	if erro != nil {
-		return nil, 0, erro
+		return nil, erro
 	}
 
 	return map[string]string{
+		"id":            strconv.Itoa(int(userID)),
 		"access_token":  t,
 		"refresh_token": rt,
-	}, int64(userID), nil
+	}, nil
 }
 
-func CreateTokenRefresh(userID uint64) (map[string]string, int64, error) {
+func CreateTokenRefresh(userID uint64) (map[string]string, error) {
 	permission := jwt.MapClaims{}
 	permission["authorized"] = true
 	permission["exp"] = time.Now().Add(time.Second * 20).Unix()
@@ -51,12 +53,12 @@ func CreateTokenRefresh(userID uint64) (map[string]string, int64, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, permission)
 	t, erro := token.SignedString([]byte(config.SecretKey))
 	if erro != nil {
-		return nil, 0, erro
+		return nil, erro
 	}
 
 	return map[string]string{
 		"access_token": t,
-	}, int64(userID), nil
+	}, nil
 
 }
 

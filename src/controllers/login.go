@@ -35,13 +35,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, userID, erro := auth.CreateTokenLogin(userDatabase.ID)
+	token, erro := auth.CreateTokenLogin(userDatabase.ID)
 	if erro != nil {
 		msgresponse.Erro(w, http.StatusInternalServerError, erro)
 		return
 	}
 
-	userToken := userTokenLogin{userID, token}
+	userToken := token
 
 	msgresponse.JSON(w, http.StatusCreated, userToken)
 }
@@ -65,13 +65,19 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	refreshToken, userID, erro := auth.CreateTokenRefresh(user.ID)
+	var userDatabase models.User
+	userDatabase.ID = 1
+	userDatabase.Email = "amigodeleo@gmail.com"
+	userDatabase.Name = "Amigo de Leo"
+	userDatabase.Password = "1234"
+
+	refreshToken, erro := auth.CreateTokenRefresh(userDatabase.ID)
 	if erro != nil {
 		msgresponse.Erro(w, http.StatusInternalServerError, erro)
 		return
 	}
 
-	userToken := userTokenLogin{userID, refreshToken}
+	userToken := refreshToken
 
 	msgresponse.JSON(w, http.StatusCreated, userToken)
 }

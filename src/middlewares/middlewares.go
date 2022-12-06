@@ -8,6 +8,7 @@ import (
 
 func Auth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		if erro := auth.ValidateToken(r); erro != nil {
 			msgresponse.Erro(w, http.StatusUnauthorized, erro)
 			return
@@ -18,6 +19,7 @@ func Auth(next http.HandlerFunc) http.HandlerFunc {
 
 func AuthRefresh(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		if erro := auth.ValidateTokenRefresh(r); erro != nil {
 			msgresponse.Erro(w, http.StatusUnauthorized, erro)
 			return

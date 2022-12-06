@@ -13,7 +13,7 @@ import (
 )
 
 type UserToken struct {
-	ID            int64
+	id            int64
 	access_token  string
 	refresh_token string
 }
